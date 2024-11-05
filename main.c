@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 void mainHelp() {
@@ -28,10 +29,55 @@ void fileHelp() {
 }
 
 void create() {
+    FILE *fp;
+    char *fileName[99];
+
+    printf("Enter name of file: ");
+    scanf("%s", fileName);
+
+    fp = fopen(strcat(fileName, ".txt"), "w");
+
+    fclose(fp);
+
+    printf("File created successfully\n");
 }
 
-void copy() {
+int copy() {
+    char fileName[99];
+    char fileName2[99];
+    char c;
+
+    printf("Enter name of file to copy: ");
+    scanf("%s", fileName);
+
+    // Open file to copy
+    FILE *fp = fopen(strcat(fileName, ".txt"), "r");
+
+    // Check file exists and return to main menu if not
+    while (fp == NULL) {
+        printf("File not found\n");
+        return 1;
+    }
+
+    printf("Enter name of new file: ");
+    scanf("%s", fileName2);
+
+    // Create new file
+    FILE *fp2 = fopen(fileName2, "w");
+
+    // Copy contents of first file to second
+    while ((c = fgetc(fp)) != EOF) {
+        fputc(c, fp2);
+    }
+
+
+    printf("File copied successfully\n");
+
+    fclose(fp);
+    fclose(fp2);
+    return 0;
 }
+
 
 void delete() {
 }
@@ -57,18 +103,15 @@ void showLine() {
 void numLines() {
 }
 
-void selectFile() {
-    FILE *fp;
-    char fileName[1024];
-    printf("Enter name of file (including file extension(.txt)): ");
 
-    fgets(fileName, 1024, stdin);
-    fp = fopen(fileName, "r+");
-
+void selectFile(char commandLog[]) {
     while (1) {
+        printf("\nFile Menu\n");
         printf("Enter choice: ");
-        char input[1024];
-        fgets(input, 1024, stdin);
+        char input[99];
+        scanf("%s", input);
+
+        input[strlen(input) - 1] = '\0'; // Remove \n character from end of string
         printf("%s\n", input);
 
         if (!strcmp(input, "help")) { mainHelp(); } else if (!strcmp(input, "append")) { append(); } else if (
@@ -83,28 +126,28 @@ void selectFile() {
 
 int main(void) {
     printf("Welcome to the command-line file editor built in C!\n");
+    printf("There is one rule: Always exclude the file extension when entering the name of a file.\n");
     printf("Enter one of the following options to use the program:\n\n");
     mainHelp();
 
     // Keep list of operations performed
-    char commandLog[1024];
-    int currentCommandNumber = 0;
+    char commandLog[100];
 
     while (1) {
-        currentCommandNumber += 1;
-
+        printf("\nMain Menu\n");
         printf("Enter choice: ");
-        char input[1024];
-        fgets(input, 1024, stdin);
+        char input[99];
+        scanf("%s", input);
 
-        input[strlen(input) - 1] = '\0'; // Remove \n character from end of string
-        printf("%s", input);
 
         if (!strcmp(input, "help")) { mainHelp(); } else if (!strcmp(input, "create")) { create(); } else if (
             !strcmp(input, "copy")) { copy(); } else if (!strcmp(input, "delete")) { delete(); } else if (!strcmp(
             input, "select")) {
-            selectFile();
-        } else if (!strcmp(input, "help")) { break; } else { printf("Invalid choice\n"); }
+            selectFile(commandLog);
+        } else if (!strcmp(input, "exit")) {
+            printf("Bye!");
+            break;
+        } else { printf("Invalid choice\n"); }
     }
     return 0;
 }
