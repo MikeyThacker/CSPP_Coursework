@@ -56,18 +56,20 @@ int copy() {
     // Check file exists and return to main menu if not
     while (fp == NULL) {
         printf("File not found\n");
-        return 1;
+        return 0;
     }
 
     printf("Enter name of new file: ");
     scanf("%s", fileName2);
 
     // Create new file
-    FILE *fp2 = fopen(fileName2, "w");
+    FILE *fp2 = fopen(strcat(fileName2, ".txt"), "w");
 
     // Copy contents of first file to second
+    int counter = 0;
     while ((c = fgetc(fp)) != EOF) {
         fputc(c, fp2);
+        counter++;
     }
 
 
@@ -75,11 +77,20 @@ int copy() {
 
     fclose(fp);
     fclose(fp2);
-    return 0;
+    return counter;
 }
 
 
 void delete() {
+    char fileName[99];
+    printf("Enter name of file to delete: ");
+    scanf("%s", fileName);
+
+    if (!remove(strcat(fileName, ".txt"))) {
+        printf("File deleted\n");
+    } else {
+        printf("File not found\n");
+    }
 }
 
 void showLog() {
@@ -131,7 +142,9 @@ int main(void) {
     mainHelp();
 
     // Keep list of operations performed
-    char commandLog[100];
+    char *commandLog[100];
+    int currentOp = 0;
+    int lines = 0; // Number of lines following each operation
 
     while (1) {
         printf("\nMain Menu\n");
@@ -139,15 +152,23 @@ int main(void) {
         char input[99];
         scanf("%s", input);
 
-
-        if (!strcmp(input, "help")) { mainHelp(); } else if (!strcmp(input, "create")) { create(); } else if (
-            !strcmp(input, "copy")) { copy(); } else if (!strcmp(input, "delete")) { delete(); } else if (!strcmp(
-            input, "select")) {
+        if (!strcmp(input, "help")) {
+            mainHelp();
+        } else if (!strcmp(input, "create")) {
+            commandLog[currentOp++] = "Created File";
+        } else if (!strcmp(input, "copy")) {
+            copy();
+        } else if (!strcmp(input, "delete")) {
+            delete();
+            lines = 0;
+        } else if (!strcmp(input, "select")) {
             selectFile(commandLog);
         } else if (!strcmp(input, "exit")) {
             printf("Bye!");
             break;
-        } else { printf("Invalid choice\n"); }
+        } else {
+            printf("Invalid input\n");
+        }
     }
     return 0;
 }
