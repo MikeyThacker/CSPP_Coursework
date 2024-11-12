@@ -29,13 +29,20 @@ void fileHelp() {
 }
 
 void create() {
-    FILE *fp;
     char *fileName[99];
 
     printf("Enter name of file: ");
     scanf("%s", fileName);
 
-    fp = fopen(strcat(fileName, ".txt"), "w");
+
+    // Check file does not already exit
+    FILE *check = fopen(strcat(fileName, ".txt"), "r");
+    if (check != NULL) {
+        printf("File already exists\n");
+        return;
+    }
+
+    FILE *fp = fopen(strcat(fileName, ".txt"), "w");
 
     fclose(fp);
 
@@ -50,6 +57,7 @@ int copy() {
     printf("Enter name of file to copy: ");
     scanf("%s", fileName);
 
+
     // Open file to copy
     FILE *fp = fopen(strcat(fileName, ".txt"), "r");
 
@@ -62,8 +70,16 @@ int copy() {
     printf("Enter name of new file: ");
     scanf("%s", fileName2);
 
+
+    // Check file does not already exit
+    FILE *check = fopen(strcat(fileName2, ".txt"), "r");
+    if (check != NULL) {
+        printf("File already exists\n");
+        return -1;
+    }
+
     // Create new file
-    FILE *fp2 = fopen(strcat(fileName2, ".txt"), "w");
+    FILE *fp2 = fopen(fileName2, "w");
 
     // Copy contents of first file to second
     int counter = 0;
@@ -115,7 +131,7 @@ void numLines() {
 }
 
 
-void selectFile(char commandLog[]) {
+void selectFile() {
     while (1) {
         printf("\nFile Menu\n");
         printf("Enter choice: ");
@@ -144,6 +160,7 @@ int main(void) {
     // Keep list of operations performed
     char *commandLog[100];
     int currentOp = 0;
+
     int lines = 0; // Number of lines following each operation
 
     while (1) {
@@ -156,13 +173,19 @@ int main(void) {
             mainHelp();
         } else if (!strcmp(input, "create")) {
             commandLog[currentOp++] = "Created File";
+            create();
         } else if (!strcmp(input, "copy")) {
-            copy();
+            lines = copy();
+            if (lines >= 0) {
+                char *tempString[100];
+                sprintf(tempString, "File of %d lines copied", lines);
+                commandLog[currentOp++] = tempString;
+            }
         } else if (!strcmp(input, "delete")) {
             delete();
             lines = 0;
         } else if (!strcmp(input, "select")) {
-            selectFile(commandLog);
+            selectFile();
         } else if (!strcmp(input, "exit")) {
             printf("Bye!");
             break;
