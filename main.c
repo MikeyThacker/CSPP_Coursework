@@ -119,7 +119,77 @@ void deleteLine() {
 }
 
 void insert() {
+    char fileName[99];
+    printf("Enter name of file: ");
+    scanf("%s", fileName);
+
+    // File to insert into
+    FILE *fp;
+    char c;
+
+    // New file with insertion
+    FILE *fp2;
+
+    fp = fopen(strcat(fileName, ".txt"), "r");
+    fp2 = fopen("Copy.txt", "w");
+
+
+    if (fp == NULL) {
+        printf("File not found\n");
+        return;
+    }
+
+    // Line to insert
+    int lineNum;
+    printf("Enter line number: ");
+    scanf("%d", &lineNum);
+
+    // Enter string to insert
+    char string[100];
+    printf("Enter string to insert: ");
+    scanf("%s", string);
+
+    // Line currently checking
+    int lineCount = 1;
+    int lineInserted = 0;
+    while (1) {
+        // Get next character
+        c = fgetc(fp);
+
+        // Check not end of file
+        if (c == EOF && !lineInserted) {
+            printf("File does not have this many lines");
+            remove("Copy.txt");
+            return;
+        }
+        if (c == EOF && lineInserted) {
+            fclose(fp);
+            fclose(fp2);
+            remove(fileName);
+            rename("Copy.txt", fileName);
+            printf("Line inserted successfully\n");
+            return;
+        }
+
+        // Put character in second file
+        fputc(c, fp2);
+
+        // Increase number of lines checked
+        if (c == '\n') {
+            lineCount++;
+        }
+
+        // Insert new line into file 2
+        if (lineCount == lineNum && !lineInserted) {
+            for (int i = 0; string[i] != '\0'; i++) {
+                fputc(string[i], fp2);
+            }
+            fputc('\n', fp2);
+            lineInserted = 1;
+        }
+    }
 }
+
 
 void showFile() {
     char fileName[99];
@@ -226,7 +296,7 @@ int main(void) {
         } else if (!strcmp(input, "copy")) {
             lines = copy();
             if (lines >= 0) {
-                char *toAdd[100];
+                char toAdd[100];
                 sprintf(toAdd, "Copied file of %d Lines", lines);
                 commandLog[currentOp++] = toAdd;
             }
