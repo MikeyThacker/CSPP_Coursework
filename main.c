@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void mainHelp() {
+void help() {
     printf("help  -  Display list of commands\n"
         "create - Create a new file\n"
         "copy  -  Copy a specified file\n"
@@ -20,6 +20,32 @@ void mainHelp() {
 
         "exit - Exit the application\n\n"
     );
+}
+
+int getNumLines(char *fileName) {
+    FILE *fp;
+    char c;
+
+    fp = fopen(fileName, "r");
+
+    if (fp == NULL) {
+        printf("File not found\n");
+        return -1;
+    }
+
+    int lineCount = 1;
+    while (1) {
+        c = fgetc(fp);
+        if (c == EOF) {
+            break;
+        }
+        if (c == '\n') {
+            lineCount++;
+        }
+    }
+
+    fclose(fp);
+    return lineCount;
 }
 
 void create() {
@@ -105,6 +131,10 @@ void delete() {
 
 void showLog(char **commandLog) {
     for (int i = 0; i < sizeof(commandLog); i++) {
+        if (commandLog[0] == '\0') {
+            printf("Command log is empty\n");
+            return;
+        }
         if (commandLog[i] == NULL) {
             return;
         }
@@ -112,13 +142,28 @@ void showLog(char **commandLog) {
     }
 }
 
-void append() {
+int append() {
+    char fileName[99];
+    printf("Enter name of file to append to: ");
+    scanf("%s", fileName);
+
+    FILE *fp = fopen(strcat(fileName, ".txt"), "a");
+    if (fp == NULL) {
+        printf("File not found\n");
+        return -1;
+    }
+
+    char string[100];
+    printf("Enter content to append: ");
+    scanf("%s", string);
+
+    fputs("\n", fp);
+    fputs(string, fp);
+    fclose(fp);
+    return getNumLines(fileName);
 }
 
-void deleteLine() {
-}
-
-void insert() {
+int insert() {
     char fileName[99];
     printf("Enter name of file: ");
     scanf("%s", fileName);
@@ -136,7 +181,7 @@ void insert() {
 
     if (fp == NULL) {
         printf("File not found\n");
-        return;
+        return -1;
     }
 
     // Line to insert
@@ -160,7 +205,7 @@ void insert() {
         if (c == EOF && !lineInserted) {
             printf("File does not have this many lines");
             remove("Copy.txt");
-            return;
+            return -1;
         }
         if (c == EOF && lineInserted) {
             fclose(fp);
@@ -168,7 +213,7 @@ void insert() {
             remove(fileName);
             rename("Copy.txt", fileName);
             printf("Line inserted successfully\n");
-            return;
+            return getNumLines(fileName);
         }
 
         // Put character in second file
@@ -189,7 +234,6 @@ void insert() {
         }
     }
 }
-
 
 void showFile() {
     char fileName[99];
@@ -266,15 +310,114 @@ void showLine() {
     fclose(fp);
 }
 
-void numLines() {
+int deleteLine() {
+    char fileName[99];
+    printf("Enter name of file: ");
+    scanf("%s", fileName);
+
+    // File to delete line in
+    FILE *fp;
+    char c;
+
+    // New file without specified line
+    FILE *fp2;
+
+    fp = fopen(strcat(fileName, ".txt"), "r");
+    fp2 = fopen("Copy.txt", "w");
+
+
+    if (fp == NULL) {
+        printf("File not found\n");
+        return -1;
+    }
+
+    // Line to delete
+    int lineNum;
+    printf("Enter line number: ");
+    scanf("%d", &lineNum);
+
+    // Line currently checking
+    int lineCount = 1;
+    int lineDeleted = 0;
+    while (1) {
+        // Get next character
+        c = fgetc(fp);
+
+        // Check not end of file
+        if (c == EOF && !lineDeleted) {
+            printf("File does not have this many lines");
+            remove("Copy.txt");
+            return -1;
+        }
+        if (c == EOF && lineDeleted) {
+            fclose(fp);
+            fclose(fp2);
+            remove(fileName);
+            rename("Copy.txt", fileName);
+            printf("Line deleted successfully\n");
+            return getNumLines(fileName);
+        }
+
+
+        // Increase number of lines checked
+        if (c == '\n') {
+            lineCount++;
+        }
+
+        if (lineCount == lineNum) {
+            // If current line is to be deleted
+            lineDeleted = 1;
+            continue;
+        } else {
+            // Put character in second file
+            fputc(c, fp2);
+        }
+    }
 }
+
+void numLines() {
+    char fileName[99];
+    printf("Enter name of file: ");
+    scanf("%s", fileName);
+
+    FILE *fp;
+    char c;
+
+    fp = fopen(strcat(fileName, ".txt"), "r");
+
+    if (fp == NULL) {
+        printf("File not found\n");
+        return;
+    }
+
+    int lineCount = 1;
+    while (1) {
+        c = fgetc(fp);
+        if (c == EOF) {
+            break;
+        }
+        if (c == '\n') {
+            lineCount++;
+        }
+    }
+
+    fclose(fp);
+    if (lineCount == 1) {
+        printf("File has 1 line \n");
+        return;
+    }
+    printf("File has %d lines \n", lineCount);
+}
+
+
+
 
 
 int main(void) {
     printf("Welcome to the command-line file editor built in C!\n");
     printf("There is one rule: Always exclude the file extension when entering the name of a file.\n");
     printf("Enter one of the following options to use the program:\n\n");
-    mainHelp();
+    help();
 
     // Keep list of operations performed
     char *commandLog[100];
@@ -289,7 +432,7 @@ int main(void) {
         scanf("%s", input);
 
         if (!strcmp(input, "help")) {
-            mainHelp();
+            help();
         } else if (!strcmp(input, "create")) {
             commandLog[currentOp++] = "Created File";
             create();
@@ -297,22 +440,37 @@ int main(void) {
             lines = copy();
             if (lines >= 0) {
                 char toAdd[100];
-                sprintf(toAdd, "Copied file of %d Lines", lines);
+                sprintf(toAdd, "Copied file of %d lines", lines);
                 commandLog[currentOp++] = toAdd;
             }
         } else if (!strcmp(input, "delete")) {
             delete();
             commandLog[currentOp++] = "Deleted File";
         } else if (!strcmp(input, "append")) {
-            append();
+            lines = append();
+            if (lines >=0) {
+                char toAdd[100];
+                sprintf(toAdd, "Appended to file of %d lines", lines);
+                commandLog[currentOp++] = toAdd;
+            }
         } else if (!strcmp(input, "insert")) {
-            insert();
+            lines = insert();
+            if (lines > 0) {
+                char toAdd[100];
+                sprintf(toAdd, "Inserted line into file of %d lines", lines);
+                commandLog[currentOp++] = toAdd;
+            }
         } else if (!strcmp(input, "showfile")) {
             showFile();
         } else if (!strcmp(input, "showline")) {
             showLine();
         } else if (!strcmp(input, "deleteline")) {
-            deleteLine();
+            lines = deleteLine();
+            if (lines >= 0) {
+                char toAdd[100];
+                sprintf(toAdd, "Deleted line in file of %d lines", lines);
+                commandLog[currentOp++] = toAdd;
+            }
         } else if (!strcmp(input, "numlines")) {
             numLines();
         } else if (!strcmp(input, "showlog")) {
