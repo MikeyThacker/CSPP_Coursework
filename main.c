@@ -3,6 +3,8 @@
 #include <string.h>
 
 void help() {
+    // Display list of commands to user
+
     printf("help  -  Display list of commands\n"
         "create - Create a new file\n"
         "copy  -  Copy a specified file\n"
@@ -23,9 +25,15 @@ void help() {
 }
 
 int getNumLines(char *fileName) {
+    /*
+     * This method calculates the number of lines in a file without asking the user for its name,
+     * It receives the name of the file as a parameter called in when called
+     */
+
     FILE *fp;
     char c;
 
+    // Open file
     fp = fopen(fileName, "r");
 
     if (fp == NULL) {
@@ -33,6 +41,7 @@ int getNumLines(char *fileName) {
         return -1;
     }
 
+    // Count number of '\n' characters in file
     int lineCount = 1;
     while (1) {
         c = fgetc(fp);
@@ -49,8 +58,8 @@ int getNumLines(char *fileName) {
 }
 
 void create() {
+    // Get name of file from user
     char *fileName[99];
-
     printf("Enter name of file: ");
     scanf("%s", fileName);
 
@@ -62,18 +71,19 @@ void create() {
         return;
     }
 
+    // Create file
     FILE *fp = fopen(fileName, "w");
-
     fclose(fp);
 
     printf("File created successfully\n");
 }
 
 int copy() {
+    // Get name of file to copy from user
+
     char fileName[99];
     char fileName2[99];
     char c;
-
     printf("Enter name of file to copy: ");
     scanf("%s", fileName);
 
@@ -85,7 +95,7 @@ int copy() {
     // Check file exists and return to main menu if not
     while (fp == NULL) {
         printf("File not found\n");
-        return 0;
+        return -1;
     }
 
     printf("Enter name of new file: ");
@@ -118,11 +128,13 @@ int copy() {
 }
 
 void delete() {
+    // Get name of file user wishes to delete
     char fileName[99];
     printf("Enter name of file to delete: ");
     scanf("%s", fileName);
 
     if (!remove(strcat(fileName, ".txt"))) {
+        // If remove() returns 0, file has been deleted
         printf("File deleted\n");
     } else {
         printf("File not found\n");
@@ -130,12 +142,16 @@ void delete() {
 }
 
 void showLog(char **commandLog) {
+    // Check command log is not empty
+    if (commandLog[0] == '\0') {
+        printf("Command log is empty\n");
+        return;
+    }
+
+    // Iterate through command log list and output n followed by the action
     for (int i = 0; i < sizeof(commandLog); i++) {
-        if (commandLog[0] == '\0') {
-            printf("Command log is empty\n");
-            return;
-        }
         if (commandLog[i] == NULL) {
+            // If item is null, list is over
             return;
         }
         printf("%d: %s\n", i + 1, commandLog[i]);
@@ -143,20 +159,24 @@ void showLog(char **commandLog) {
 }
 
 int append() {
+    // Get name of file user wishes to append to
     char fileName[99];
     printf("Enter name of file to append to: ");
     scanf("%s", fileName);
 
+    // Open file in append mode
     FILE *fp = fopen(strcat(fileName, ".txt"), "a");
     if (fp == NULL) {
         printf("File not found\n");
         return -1;
     }
 
+    // Get string user wishes to append to file
     char string[100];
     printf("Enter content to append: ");
     scanf("%s", string);
 
+    // Add new line and string to file
     fputs("\n", fp);
     fputs(string, fp);
     fclose(fp);
@@ -236,20 +256,23 @@ int insert() {
 }
 
 void showFile() {
+    // Get name of file user wishes to show
     char fileName[99];
     printf("Enter name of file: ");
     scanf("%s", fileName);
 
+    // Open file in read mode
     FILE *fp;
     char c;
-
     fp = fopen(strcat(fileName, ".txt"), "r");
 
+    // Check file exists
     if (fp == NULL) {
         printf("File not found\n");
         return;
     }
 
+    // Output each character until end of file is reached
     while (1) {
         c = (char) fgetc(fp);
         if (c == EOF) {
@@ -262,39 +285,45 @@ void showFile() {
 }
 
 void showLine() {
+    // Get name of file user wishes to read line of
     char fileName[99];
     printf("Enter name of file: ");
     scanf("%s", fileName);
 
+    // Open file
     FILE *fp;
     char c;
-
     fp = fopen(strcat(fileName, ".txt"), "r");
 
+    // Check file exists
     if (fp == NULL) {
         printf("File not found\n");
         return;
     }
 
-    // Line to print
+    // Get line to print from user
     int lineNum;
     printf("Enter line number: ");
     scanf("%d", &lineNum);
 
-    // Line currently checking
-    int lineCount = 1;
+    // List through each character of file until desired file is reached
+    int lineCount = 1; // Line currently checking
     while (1) {
         c = fgetc(fp);
+        // If end of file is reached, number of lines in file is less than input
         if (c == EOF) {
             printf("File does not have this many lines");
             break;
-        } else {
-            if (c == '\n') {
-                lineCount++;
-            }
+        }
+
+        // If end of line is reached, add to count
+        if (c == '\n') {
+            lineCount++;
 
             if (lineCount == lineNum) {
+                // If current line is desired line to print
                 while (1) {
+                    // Continue printing characters until newline character is reached
                     c = (char) fgetc(fp);
                     if (c == EOF || c == '\n') {
                         break;
@@ -311,6 +340,14 @@ void showLine() {
 }
 
 int deleteLine() {
+    /*
+     * The deleteLine() method works by creating a new file,
+     * Copying every character
+     * Until line to 'delete' is reached
+     * In which case, do nothing
+     */
+
+    // Get name of file to delete line of
     char fileName[99];
     printf("Enter name of file: ");
     scanf("%s", fileName);
@@ -322,16 +359,17 @@ int deleteLine() {
     // New file without specified line
     FILE *fp2;
 
+    // Open file to delete line from and new file without said line
     fp = fopen(strcat(fileName, ".txt"), "r");
     fp2 = fopen("Copy.txt", "w");
 
-
+    // Check first file exists
     if (fp == NULL) {
         printf("File not found\n");
         return -1;
     }
 
-    // Line to delete
+    // Line number to delete
     int lineNum;
     printf("Enter line number: ");
     scanf("%d", &lineNum);
@@ -343,13 +381,20 @@ int deleteLine() {
         // Get next character
         c = fgetc(fp);
 
-        // Check not end of file
         if (c == EOF && !lineDeleted) {
+            // If end of file is reached and line has not been 'deleted'
             printf("File does not have this many lines");
             remove("Copy.txt");
             return -1;
         }
+
         if (c == EOF && lineDeleted) {
+            /*
+             * If end of file is reached and line HAS been deleted
+             * Close both files
+             * Delete first file
+             * Rename second file to first
+             */
             fclose(fp);
             fclose(fp2);
             remove(fileName);
@@ -365,9 +410,11 @@ int deleteLine() {
         }
 
         if (lineCount == lineNum) {
-            // If current line is to be deleted
+            /*
+             * If current line is to be deleted,
+             * Ignore all characters on this line
+             */
             lineDeleted = 1;
-            continue;
         } else {
             // Put character in second file
             fputc(c, fp2);
@@ -376,20 +423,23 @@ int deleteLine() {
 }
 
 void numLines() {
+    // Get name of file from user
     char fileName[99];
     printf("Enter name of file: ");
     scanf("%s", fileName);
 
+    // Open file
     FILE *fp;
     char c;
-
     fp = fopen(strcat(fileName, ".txt"), "r");
 
+    // Check file exists
     if (fp == NULL) {
         printf("File not found\n");
         return;
     }
 
+    // Count number of '\n' characters in file
     int lineCount = 1;
     while (1) {
         c = fgetc(fp);
@@ -401,16 +451,16 @@ void numLines() {
         }
     }
 
+    // Close file
     fclose(fp);
+
+    // Output answer
     if (lineCount == 1) {
         printf("File has 1 line \n");
         return;
     }
     printf("File has %d lines \n", lineCount);
 }
-
-
-
 
 
 int main(void) {
@@ -427,10 +477,13 @@ int main(void) {
 
     while (1) {
         printf("\nMain Menu\n");
+
+        // Get user choice
         printf("Enter choice: ");
         char input[99];
         scanf("%s", input);
 
+        // Perform action based on user input and add action to command Log if applicable
         if (!strcmp(input, "help")) {
             help();
         } else if (!strcmp(input, "create")) {
@@ -448,7 +501,7 @@ int main(void) {
             commandLog[currentOp++] = "Deleted File";
         } else if (!strcmp(input, "append")) {
             lines = append();
-            if (lines >=0) {
+            if (lines >= 0) {
                 char toAdd[100];
                 sprintf(toAdd, "Appended to file of %d lines", lines);
                 commandLog[currentOp++] = toAdd;
