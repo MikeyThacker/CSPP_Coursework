@@ -8,7 +8,7 @@ void help() {
     printf("help  -  Display list of commands\n"
         "create - Create a new file\n"
         "copy  -  Copy a specified file\n"
-        "delete - Delete a file\n"
+        "delete - Delete a file\n\n"
 
         "append  -  Create new line at end of file\n"
         "insert  -  Insert new line of content at line number\n\n"
@@ -127,17 +127,20 @@ int copy() {
     return counter;
 }
 
-void delete() {
+int delete() {
     // Get name of file user wishes to delete
     char fileName[99];
     printf("Enter name of file to delete: ");
     scanf("%s", fileName);
 
+
     if (!remove(strcat(fileName, ".txt"))) {
         // If remove() returns 0, file has been deleted
         printf("File deleted\n");
+        return getNumLines(fileName);
     } else {
         printf("File not found\n");
+        return -1;
     }
 }
 
@@ -497,20 +500,24 @@ int main(void) {
                 commandLog[currentOp++] = toAdd;
             }
         } else if (!strcmp(input, "delete")) {
-            delete();
-            commandLog[currentOp++] = "Deleted File";
+            lines = delete();
+            if (lines >= 0) {
+                char toAdd[100];
+                sprintf(toAdd, "Deleted file of %d lines", lines);
+                commandLog[currentOp++] = toAdd;
+            }
         } else if (!strcmp(input, "append")) {
             lines = append();
             if (lines >= 0) {
                 char toAdd[100];
-                sprintf(toAdd, "Appended to file of %d lines", lines);
+                sprintf(toAdd, "Appended line to file of %d lines", lines - 1);
                 commandLog[currentOp++] = toAdd;
             }
         } else if (!strcmp(input, "insert")) {
             lines = insert();
             if (lines > 0) {
                 char toAdd[100];
-                sprintf(toAdd, "Inserted line into file of %d lines", lines);
+                sprintf(toAdd, "Inserted line into file of %d lines", lines - 1);
                 commandLog[currentOp++] = toAdd;
             }
         } else if (!strcmp(input, "showfile")) {
@@ -521,7 +528,7 @@ int main(void) {
             lines = deleteLine();
             if (lines >= 0) {
                 char toAdd[100];
-                sprintf(toAdd, "Deleted line in file of %d lines", lines);
+                sprintf(toAdd, "Deleted line in file of %d lines", lines - 1);
                 commandLog[currentOp++] = toAdd;
             }
         } else if (!strcmp(input, "numlines")) {
@@ -542,4 +549,15 @@ int main(void) {
  * Additional Features to Add:
  *  Showing files in cd to work on,
  *  Renaming files?
+ *
+ *  Discussed with Matt:
+ *   Adding multiple one-line additional features - simple things not included in part (a)
+ *   Accessibility mode - going to be difficult to implement in terminal
+ *   Undo function
+ *
+ *
+ *  Write-Up:
+ *   Talk about how cannot insert directly into a file, have to create a new file and copy contents
+ *   -> Same with deleting lines in a file
+ *
  */
