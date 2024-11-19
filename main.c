@@ -554,6 +554,7 @@ int main(void) {
  *   Adding multiple one-line additional features - simple things not included in part (a)
  *   Accessibility mode - going to be difficult to implement in terminal
  *   Undo function
+ *   Showing files in cd that user has created
  *
  *
  *  Write-Up:
