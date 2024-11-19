@@ -24,7 +24,7 @@ void help() {
     );
 }
 
-int getNumLines(char *fileName) {
+int getNumLines(const char *fileName) {
     /*
      * This method calculates the number of lines in a file without asking the user for its name,
      * It receives the name of the file as a parameter called in when called
