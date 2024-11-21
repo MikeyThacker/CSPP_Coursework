@@ -1,6 +1,7 @@
 #include <stdio.h> // Import IO functionality i.e., Accessing files and printing to user
 #include <stdlib.h>
 #include <string.h> // Gives extra use for strings e.g., string concatenation and comparison
+#include <dirent.h> // Allows opening, reading and close directory
 
 void help() {
     // Display list of commands to user
@@ -22,7 +23,7 @@ void help() {
 
         "Additional Features:\n"
         "rename - Rename a file\n"
-        "cd - Show files in current directory"
+        "cd - Show operable files in current directory\n\n"
 
         "exit - Exit the application\n\n"
     );
@@ -141,10 +142,10 @@ int delete() {
     if (!remove(strcat(fileName, ".txt"))) {
         // If remove() returns 0, file has been deleted
         printf("File deleted\n");
-        return getNumLines(fileName);
+        return 0;
     } else {
         printf("File not found\n");
-        return -1;
+        return 1;
     }
 }
 
@@ -243,14 +244,6 @@ int insert() {
             return getNumLines(fileName);
         }
 
-        // Put character in second file
-        fputc(c, fp2);
-
-        // Increase number of lines checked
-        if (c == '\n') {
-            lineCount++;
-        }
-
         // Insert new line into file 2
         if (lineCount == lineNum && !lineInserted) {
             for (int i = 0; string[i] != '\0'; i++) {
@@ -258,6 +251,14 @@ int insert() {
             }
             fputc('\n', fp2);
             lineInserted = 1;
+        }
+        // Put character in second file
+        fputc(c, fp2);
+
+
+        // Increase number of lines checked
+        if (c == '\n') {
+            lineCount++;
         }
     }
 }
@@ -410,12 +411,6 @@ int deleteLine() {
             return getNumLines(fileName);
         }
 
-
-        // Increase number of lines checked
-        if (c == '\n') {
-            lineCount++;
-        }
-
         if (lineCount == lineNum) {
             /*
              * If current line is to be deleted,
@@ -425,6 +420,11 @@ int deleteLine() {
         } else {
             // Put character in second file
             fputc(c, fp2);
+        }
+
+        // Increase number of lines checked
+        if (c == '\n') {
+            lineCount++;
         }
     }
 }
@@ -502,10 +502,49 @@ int renameFile() {
 
     // Rename file and return number of lines
     rename(oldName, newName);
+    printf("File renamed successfully\n");
     return getNumLines(newName);
 }
 
 void cd() {
+    DIR *dir; // directory stream variable - essentially list of all entries in cwd
+    struct dirent *entry; // represents what type of thing is in directory (file,folder...)
+
+    dir = opendir("."); // Open current working directory
+
+    // Check directory opened successfully
+    if (dir == NULL) {
+        printf("Directory not opened\n");
+        return;
+    }
+
+
+    // Repeat until no more entries in directory
+    while (1) {
+        entry = readdir(dir); // Read next entry in directory and store in entry
+
+        if (entry == NULL) {
+            // No more entries in directory
+            break;
+        }
+
+        // Check type of entry (.txt, .c, folder)
+        if (entry->d_type == DT_REG) {
+            char fileName[99];
+            sprintf(fileName, "%s", entry->d_name);
+
+            if (!strcmp(fileName + strlen(fileName) - 4, ".txt")) {
+                // If entry is a txt file (ends in .txt)
+
+                // Print filename
+                printf("%s\n", fileName);
+            }
+        }
+    }
+
+    if (closedir(dir) == -1) {
+        printf("Error closing directory\n");
+    }
 }
 
 
@@ -543,11 +582,8 @@ int main(void) {
                 commandLog[currentOp++] = toAdd;
             }
         } else if (!strcmp(input, "delete")) {
-            lines = delete();
-            if (lines >= 0) {
-                char toAdd[100];
-                sprintf(toAdd, "Deleted file of %d lines", lines);
-                commandLog[currentOp++] = toAdd;
+            if (!delete()) {
+                commandLog[currentOp++] = "Deleted File";
             }
         } else if (!strcmp(input, "append")) {
             lines = append();

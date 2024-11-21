@@ -1,4 +1,4 @@
-# Install script for directory: /Users/mikeythacker/Desktop/Uni/Computer Systems and Professional Practice/CSPP-Coursework
+# Install script for directory: /Users/mikeythacker/Desktop/Uni/ComputerSystems AndProfessionalPractice/CSPP-Coursework
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/mikeythacker/Desktop/Uni/Computer Systems and Professional Practice/CSPP-Coursework/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/mikeythacker/Desktop/Uni/ComputerSystems AndProfessionalPractice/CSPP-Coursework/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
