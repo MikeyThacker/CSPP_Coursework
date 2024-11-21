@@ -1,7 +1,7 @@
 #include <stdio.h> // Import IO functionality i.e., Accessing files and printing to user
 #include <stdlib.h>
 #include <string.h> // Gives extra use for strings e.g., string concatenation and comparison
-#include <dirent.h> // Allows opening, reading and close directory
+#include <dirent.h> // Allows opening, reading, and closing directory
 
 void help() {
     // Display list of commands to user
@@ -188,6 +188,8 @@ int append() {
     fputs("\n", fp);
     fputs(string, fp);
     fclose(fp);
+
+    printf("Content appended successfully\n");
     return getNumLines(fileName);
 }
 
@@ -529,7 +531,7 @@ void cd() {
         }
 
         // Check type of entry (.txt, .c, folder)
-        if (entry->d_type == DT_REG) {
+        if (entry->d_type == DT_REG) { // DT_REG means Regular file
             char fileName[99];
             sprintf(fileName, "%s", entry->d_name);
 
