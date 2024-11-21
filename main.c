@@ -20,6 +20,10 @@ void help() {
 
         "showlog - Show the sequence of all operations performed so far\n\n"
 
+        "Additional Features:\n"
+        "rename - Rename a file\n"
+        "cd - Show files in current directory"
+
         "exit - Exit the application\n\n"
     );
 }
@@ -465,6 +469,34 @@ void numLines() {
     printf("File has %d lines \n", lineCount);
 }
 
+int renameFile() {
+    // Get name of file user wishes to rename
+    char oldName[99];
+    printf("Enter name of file: ");
+    scanf("%s", oldName);
+
+    // Get new name of file
+    char newName[99];
+    printf("Enter name of file: ");
+    scanf("%s", newName);
+
+    // Check file with new name does not already exist
+    FILE *fp;
+    fp = fopen(strcat(oldName, ".txt"), "r");
+    if (fp != NULL) {
+        printf("File with this name already exists\n");
+        fclose(fp);
+        return -1;
+    }
+
+    // Rename file and return number of lines
+    rename(oldName, strcat(newName, ".txt"));
+    return getNumLines(newName);
+}
+
+void cd() {
+}
+
 
 int main(void) {
     printf("Welcome to the command-line file editor built in C!\n");
@@ -535,6 +567,15 @@ int main(void) {
             numLines();
         } else if (!strcmp(input, "showlog")) {
             showLog(commandLog);
+        } else if (!strcmp(input, "rename")) {
+            lines = renameFile();
+            if (lines >= 0) {
+                char toAdd[100];
+                sprintf(toAdd, "Renamed file of %d lines", lines);
+                commandLog[currentOp++] = toAdd;
+            }
+        } else if (!strcmp(input, "cd")) {
+            cd();
         } else if (!strcmp(input, "exit")) {
             printf("Bye!");
             break;
