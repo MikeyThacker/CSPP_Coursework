@@ -551,6 +551,7 @@ void cd() {
 
 
 int main(void) {
+
     printf("Welcome to the command-line file editor built in C!\n");
     printf("There is one rule: Always exclude the file extension when entering the name of a file.\n");
     printf("Enter one of the following options to use the program:\n\n");
