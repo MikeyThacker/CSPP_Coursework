@@ -1,6 +1,6 @@
-#include <stdio.h>
+#include <stdio.h> // Import IO functionality i.e., Accessing files and printing to user
 #include <stdlib.h>
-#include <string.h>
+#include <string.h> // Gives extra use for strings e.g., string concatenation and comparison
 
 void help() {
     // Display list of commands to user
@@ -555,10 +555,5 @@ int main(void) {
  *   Accessibility mode - going to be difficult to implement in terminal
  *   Undo function
  *   Showing files in cd that user has created
- *
- *
- *  Write-Up:
- *   Talk about how cannot insert directly into a file, have to create a new file and copy contents
- *   -> Same with deleting lines in a file
  *
  */
