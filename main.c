@@ -475,22 +475,34 @@ int renameFile() {
     printf("Enter name of file: ");
     scanf("%s", oldName);
 
+
+    // Check file exists
+    FILE *fp1;
+    fp1 = fopen(strcat(oldName, ".txt"), "r");
+    while (fp1 == NULL) {
+        printf("File not found\n");
+        fclose(fp1);
+        return -1;
+    }
+    fclose(fp1);
+
     // Get new name of file
     char newName[99];
-    printf("Enter name of file: ");
+    printf("Enter new name for file: ");
     scanf("%s", newName);
 
     // Check file with new name does not already exist
-    FILE *fp;
-    fp = fopen(strcat(oldName, ".txt"), "r");
-    if (fp != NULL) {
+    FILE *fp2;
+    fp2 = fopen(strcat(newName, ".txt"), "r");
+    if (fp2 != NULL) {
         printf("File with this name already exists\n");
-        fclose(fp);
+        fclose(fp2);
         return -1;
     }
+    fclose(fp2);
 
     // Rename file and return number of lines
-    rename(oldName, strcat(newName, ".txt"));
+    rename(oldName, newName);
     return getNumLines(newName);
 }
 
