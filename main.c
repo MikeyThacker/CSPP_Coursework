@@ -475,7 +475,6 @@ int renameFile() {
     printf("Enter name of file: ");
     scanf("%s", oldName);
 
-
     // Check file exists
     FILE *fp1;
     fp1 = fopen(strcat(oldName, ".txt"), "r");
