@@ -25,7 +25,7 @@ void help() {
         "rename - Rename a file\n"
         "cd - Show operable files in current directory\n\n"
 
-        "exit - Exit the application\n\n"
+        "exit - Exit the application\n"
     );
 }
 
@@ -561,7 +561,7 @@ int main(void) {
     int lines = 0; // Number of lines following each operation
 
     while (1) {
-        printf("\nMain Menu\n");
+        printf("\n\nMain Menu\n");
 
         // Get user choice
         printf("Enter choice: ");
@@ -632,16 +632,3 @@ int main(void) {
     }
     return 0;
 }
-
-/*
- * Additional Features to Add:
- *  Showing files in cd to work on,
- *  Renaming files?
- *
- *  Discussed with Matt:
- *   Adding multiple one-line additional features - simple things not included in part (a)
- *   Accessibility mode - going to be difficult to implement in terminal
- *   Undo function
- *   Showing files in cd that user has created
- *
- */

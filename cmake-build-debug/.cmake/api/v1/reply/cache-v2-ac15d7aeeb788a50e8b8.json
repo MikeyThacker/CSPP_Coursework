@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/mikeythacker/Desktop/Uni/Computer Systems and Professional Practice/CSPP-Coursework/cmake-build-debug"
+			"value" : "/Users/mikeythacker/Desktop/Uni/ComputerSystems AndProfessionalPractice/CSPP-Coursework/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -383,7 +383,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/mikeythacker/Desktop/Uni/Computer Systems and Professional Practice/CSPP-Coursework/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "/Users/mikeythacker/Desktop/Uni/ComputerSystems AndProfessionalPractice/CSPP-Coursework/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -443,7 +443,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/mikeythacker/Desktop/Uni/Computer Systems and Professional Practice/CSPP-Coursework"
+			"value" : "/Users/mikeythacker/Desktop/Uni/ComputerSystems AndProfessionalPractice/CSPP-Coursework"
 		},
 		{
 			"name" : "CMAKE_INSTALL_NAME_TOOL",
@@ -1031,7 +1031,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/mikeythacker/Desktop/Uni/Computer Systems and Professional Practice/CSPP-Coursework/cmake-build-debug"
+			"value" : "/Users/mikeythacker/Desktop/Uni/ComputerSystems AndProfessionalPractice/CSPP-Coursework/cmake-build-debug"
 		},
 		{
 			"name" : "CSPP_Coursework_IS_TOP_LEVEL",
@@ -1055,7 +1055,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/mikeythacker/Desktop/Uni/Computer Systems and Professional Practice/CSPP-Coursework"
+			"value" : "/Users/mikeythacker/Desktop/Uni/ComputerSystems AndProfessionalPractice/CSPP-Coursework"
 		}
 	],
 	"kind" : "cache",
