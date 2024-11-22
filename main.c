@@ -1,5 +1,4 @@
 #include <stdio.h> // Import IO functionality i.e., Accessing files and printing to user
-#include <stdlib.h>
 #include <string.h> // Gives extra use for strings e.g., string concatenation and comparison
 #include <dirent.h> // Allows opening, reading, and closing directory
 
@@ -23,7 +22,7 @@ void help() {
 
         "Additional Features:\n"
         "rename - Rename a file\n"
-        "cd - Show operable files in current directory\n\n"
+        "ls - Show operable files in current directory\n\n"
 
         "exit - Exit the application\n"
     );
@@ -508,7 +507,7 @@ int renameFile() {
     return getNumLines(newName);
 }
 
-void cd() {
+void ls() {
     DIR *dir; // directory stream variable - essentially list of all entries in cwd
     struct dirent *entry; // represents what type of thing is in directory (file,folder...)
 
@@ -624,8 +623,8 @@ int main(void) {
                 sprintf(toAdd, "Renamed file of %d lines", lines);
                 commandLog[currentOp++] = toAdd;
             }
-        } else if (!strcmp(input, "cd")) {
-            cd();
+        } else if (!strcmp(input, "ls")) {
+            ls();
         } else if (!strcmp(input, "exit")) {
             printf("Bye!");
             break;
