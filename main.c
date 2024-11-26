@@ -1,6 +1,7 @@
 #include <stdio.h> // Import IO functionality i.e., Accessing files and printing to user
 #include <string.h> // Gives extra use for strings e.g., string concatenation and comparison
 #include <dirent.h> // Allows opening, reading, and closing directory
+#include <stdlib.h>
 
 void help() {
     // Display list of commands to user
@@ -28,6 +29,21 @@ void help() {
     );
 }
 
+void getUserInput(char *userInput, int size) {
+    fgets(userInput, size, stdin);
+    userInput[strlen(userInput) - 1] = '\0';
+}
+
+int getUserInt() {
+    // Get string input from user
+    char tempString[99];
+    fgets(tempString, sizeof(tempString), stdin);
+
+    // Convert string input to integer
+    int userInt = strtol(tempString, NULL, 10);
+    return userInt;
+}
+
 int getNumLines(const char *fileName) {
     /*
      * This method calculates the number of lines in a file without asking the user for its name,
@@ -46,10 +62,14 @@ int getNumLines(const char *fileName) {
     }
 
     // Count number of '\n' characters in file
-    int lineCount = 1;
+    int lineCount = 0;
     while (1) {
         c = fgetc(fp);
         if (c == EOF) {
+            if (lineCount == 0) {
+                break;
+            }
+            lineCount++;
             break;
         }
         if (c == '\n') {
@@ -63,9 +83,9 @@ int getNumLines(const char *fileName) {
 
 void create() {
     // Get name of file from user
-    char *fileName[99];
     printf("Enter name of file: ");
-    scanf("%s", fileName);
+    char fileName[99];
+    getUserInput(fileName, sizeof(fileName));
 
 
     // Check file does not already exit
@@ -74,6 +94,7 @@ void create() {
         printf("File already exists\n");
         return;
     }
+    fclose(check);
 
     // Create file
     FILE *fp = fopen(fileName, "w");
@@ -83,13 +104,12 @@ void create() {
 }
 
 int copy() {
-    // Get name of file to copy from user
-
-    char fileName[99];
-    char fileName2[99];
     char c;
+
+    // Get name of file to copy from user
     printf("Enter name of file to copy: ");
-    scanf("%s", fileName);
+    char fileName[99];
+    getUserInput(fileName, sizeof(fileName));
 
 
     // Open file to copy
@@ -102,8 +122,10 @@ int copy() {
         return -1;
     }
 
+
     printf("Enter name of new file: ");
-    scanf("%s", fileName2);
+    char fileName2[99];
+    getUserInput(fileName2, sizeof(fileName2));
 
 
     // Check file does not already exit
@@ -133,14 +155,15 @@ int copy() {
 
 int delete() {
     // Get name of file user wishes to delete
+    printf("Enter name of file: ");
     char fileName[99];
-    printf("Enter name of file to delete: ");
-    scanf("%s", fileName);
+    getUserInput(fileName, sizeof(fileName));
 
 
     if (!remove(strcat(fileName, ".txt"))) {
         // If remove() returns 0, file has been deleted
         printf("File deleted\n");
+
         return 0;
     } else {
         printf("File not found\n");
@@ -150,52 +173,61 @@ int delete() {
 
 void showLog(char **commandLog) {
     // Check command log is not empty
-    if (commandLog[0] == '\0') {
+    if (commandLog[0] == NULL) {
         printf("Command log is empty\n");
         return;
     }
 
     // Iterate through command log list and output n followed by the action
-    for (int i = 0; i < sizeof(commandLog); i++) {
-        if (commandLog[i] == NULL) {
-            // If item is null, list is over
-            return;
-        }
+    for (int i = 0; commandLog[i] != NULL; i++) {
+        // If item is null, list is over
         printf("%d: %s\n", i + 1, commandLog[i]);
     }
 }
 
 int append() {
     // Get name of file user wishes to append to
+    printf("Enter name of file: ");
     char fileName[99];
-    printf("Enter name of file to append to: ");
-    scanf("%s", fileName);
+    getUserInput(fileName, sizeof(fileName));
+
+    // Open file in read mode to check if it is empty
+    int fileEmpty = 0;
+    if (getNumLines(strcat(fileName, ".txt")) == 0) {
+        fileEmpty = 1;
+    }
 
     // Open file in append mode
-    FILE *fp = fopen(strcat(fileName, ".txt"), "a");
+    FILE *fp = fopen(fileName, "a");
     if (fp == NULL) {
         printf("File not found\n");
         return -1;
     }
 
     // Get string user wishes to append to file
-    char string[100];
     printf("Enter content to append: ");
-    scanf("%s", string);
+    char string[99];
+    getUserInput(string, sizeof(string));
 
-    // Add new line and string to file
-    fputs("\n", fp);
+
+    // Add string to file
+
+    if (!fileEmpty) {
+        fputs("\n", fp);
+    }
     fputs(string, fp);
     fclose(fp);
 
     printf("Content appended successfully\n");
-    return getNumLines(fileName);
+
+    int numLines = getNumLines(fileName);
+    return numLines;
 }
 
 int insert() {
-    char fileName[99];
     printf("Enter name of file: ");
-    scanf("%s", fileName);
+    char fileName[99];
+    getUserInput(fileName, sizeof(fileName));
 
     // File to insert into
     FILE *fp;
@@ -214,14 +246,13 @@ int insert() {
     }
 
     // Line to insert
-    int lineNum;
     printf("Enter line number: ");
-    scanf("%d", &lineNum);
+    int lineNum = getUserInt();
 
     // Enter string to insert
-    char string[100];
     printf("Enter string to insert: ");
-    scanf("%s", string);
+    char string[99];
+    getUserInput(string, sizeof(string));
 
     // Line currently checking
     int lineCount = 1;
@@ -242,7 +273,9 @@ int insert() {
             remove(fileName);
             rename("Copy.txt", fileName);
             printf("Line inserted successfully\n");
-            return getNumLines(fileName);
+
+            int numLines = getNumLines(fileName);
+            return numLines;
         }
 
         // Insert new line into file 2
@@ -266,9 +299,9 @@ int insert() {
 
 void showFile() {
     // Get name of file user wishes to show
-    char fileName[99];
     printf("Enter name of file: ");
-    scanf("%s", fileName);
+    char fileName[99];
+    getUserInput(fileName, sizeof(fileName));
 
     // Open file in read mode
     FILE *fp;
@@ -286,18 +319,17 @@ void showFile() {
         c = (char) fgetc(fp);
         if (c == EOF) {
             break;
-        } else {
-            printf("%c", c);
         }
+        printf("%c", c);
     }
     fclose(fp);
 }
 
 void showLine() {
     // Get name of file user wishes to read line of
-    char fileName[99];
     printf("Enter name of file: ");
-    scanf("%s", fileName);
+    char fileName[99];
+    getUserInput(fileName, sizeof(fileName));
 
     // Open file
     FILE *fp;
@@ -311,9 +343,8 @@ void showLine() {
     }
 
     // Get line to print from user
-    int lineNum;
     printf("Enter line number: ");
-    scanf("%d", &lineNum);
+    int lineNum = getUserInt();
 
     // List through each character of file until desired file is reached
     int lineCount = 1; // Line currently checking
@@ -357,9 +388,9 @@ int deleteLine() {
      */
 
     // Get name of file to delete line of
-    char fileName[99];
     printf("Enter name of file: ");
-    scanf("%s", fileName);
+    char fileName[99];
+    getUserInput(fileName, sizeof(fileName));
 
     // File to delete line in
     FILE *fp;
@@ -379,9 +410,8 @@ int deleteLine() {
     }
 
     // Line number to delete
-    int lineNum;
     printf("Enter line number: ");
-    scanf("%d", &lineNum);
+    int lineNum = getUserInt();
 
     // Line currently checking
     int lineCount = 1;
@@ -432,9 +462,9 @@ int deleteLine() {
 
 void numLines() {
     // Get name of file from user
-    char fileName[99];
     printf("Enter name of file: ");
-    scanf("%s", fileName);
+    char fileName[99];
+    getUserInput(fileName, sizeof(fileName));
 
     // Open file
     FILE *fp;
@@ -472,9 +502,9 @@ void numLines() {
 
 int renameFile() {
     // Get name of file user wishes to rename
-    char oldName[99];
     printf("Enter name of file: ");
-    scanf("%s", oldName);
+    char oldName[99];
+    getUserInput(oldName, sizeof(oldName));
 
     // Check file exists
     FILE *fp1;
@@ -487,9 +517,9 @@ int renameFile() {
     fclose(fp1);
 
     // Get new name of file
+    printf("Enter name of file: ");
     char newName[99];
-    printf("Enter new name for file: ");
-    scanf("%s", newName);
+    getUserInput(newName, sizeof(newName));
 
     // Check file with new name does not already exist
     FILE *fp2;
@@ -530,7 +560,8 @@ void ls() {
         }
 
         // Check type of entry (.txt, .c, folder)
-        if (entry->d_type == DT_REG) { // DT_REG means Regular file
+        if (entry->d_type == DT_REG) {
+            // DT_REG means Regular file
             char fileName[99];
             sprintf(fileName, "%s", entry->d_name);
 
@@ -550,7 +581,6 @@ void ls() {
 
 
 int main(void) {
-
     printf("Welcome to the command-line file editor built in C!\n");
     printf("There is one rule: Always exclude the file extension when entering the name of a file.\n");
     printf("Enter one of the following options to use the program:\n\n");
@@ -560,7 +590,7 @@ int main(void) {
     char *commandLog[100];
     int currentOp = 0;
 
-    int lines = 0; // Number of lines following each operation
+    int lines = 0; // Number of lines following each operation, if -1, command has failed.
 
     while (1) {
         printf("\n\nMain Menu\n");
@@ -568,38 +598,47 @@ int main(void) {
         // Get user choice
         printf("Enter choice: ");
         char input[99];
-        scanf("%s", input);
+        getUserInput(input, sizeof(input));
 
         // Perform action based on user input and add action to command Log if applicable
         if (!strcmp(input, "help")) {
             help();
         } else if (!strcmp(input, "create")) {
-            commandLog[currentOp++] = "Created File";
+            commandLog[currentOp] = malloc(13); // Allocate enough memory in commandLog[i] to fit string
+            strcpy(commandLog[currentOp++], "Created File"); // Add string to commandLog[currentOp] and increment
             create();
         } else if (!strcmp(input, "copy")) {
             lines = copy();
             if (lines >= 0) {
-                char toAdd[100];
-                sprintf(toAdd, "Copied file of %d lines", lines);
-                commandLog[currentOp++] = toAdd;
+                char *toAdd = malloc(36); // Allocate enough memory for string
+                snprintf(toAdd, 36, "Copied file of %d lines", lines); // Insert number of lines into string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
+                strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
+                free(toAdd); // Free memory used by toAdd
             }
         } else if (!strcmp(input, "delete")) {
             if (!delete()) {
-                commandLog[currentOp++] = "Deleted File";
+                commandLog[currentOp] = malloc(13); // Allocate enough memory in commandLog[i] to fit string
+                strcpy(commandLog[currentOp++], "Deleted File"); // Add string to commandLog[currentOp] and increment
             }
         } else if (!strcmp(input, "append")) {
             lines = append();
             if (lines >= 0) {
-                char toAdd[100];
-                sprintf(toAdd, "Appended line to file of %d lines", lines - 1);
-                commandLog[currentOp++] = toAdd;
+                char *toAdd = malloc(36); // Allocate enough memory for string
+                snprintf(toAdd, 36, "Appended line to file of %d lines", lines - 1); // Insert number of lines into string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
+                strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
+                free(toAdd); // Free memory used by toAdd
             }
         } else if (!strcmp(input, "insert")) {
+
             lines = insert();
             if (lines > 0) {
-                char toAdd[100];
-                sprintf(toAdd, "Inserted line into file of %d lines", lines - 1);
-                commandLog[currentOp++] = toAdd;
+                char *toAdd = malloc(36); // Allocate enough memory for string
+                snprintf(toAdd, 36, "Inserted line into file of %d lines", lines - 1); // Insert number of lines into string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
+                strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
+                free(toAdd); // Free memory used by toAdd
             }
         } else if (!strcmp(input, "showfile")) {
             showFile();
@@ -608,9 +647,11 @@ int main(void) {
         } else if (!strcmp(input, "deleteline")) {
             lines = deleteLine();
             if (lines >= 0) {
-                char toAdd[100];
-                sprintf(toAdd, "Deleted line in file of %d lines", lines - 1);
-                commandLog[currentOp++] = toAdd;
+                char *toAdd = malloc(36); // Allocate enough memory for string
+                snprintf(toAdd, 36, "Deleted line in file of %d lines", lines + 1); // Insert number of lines into string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
+                strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
+                free(toAdd); // Free memory used by toAdd
             }
         } else if (!strcmp(input, "numlines")) {
             numLines();
@@ -619,9 +660,11 @@ int main(void) {
         } else if (!strcmp(input, "rename")) {
             lines = renameFile();
             if (lines >= 0) {
-                char toAdd[100];
-                sprintf(toAdd, "Renamed file of %d lines", lines);
-                commandLog[currentOp++] = toAdd;
+                char *toAdd = malloc(36); // Allocate enough memory for string
+                snprintf(toAdd, 36, "Renamed file of %d lines", lines); // Insert number of lines into string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
+                strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
+                free(toAdd); // Free memory used by toAdd
             }
         } else if (!strcmp(input, "ls")) {
             ls();
@@ -631,6 +674,8 @@ int main(void) {
         } else {
             printf("Invalid input\n");
         }
+
+        free(input);
     }
     return 0;
 }

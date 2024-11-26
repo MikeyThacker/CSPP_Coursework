@@ -3,4 +3,5 @@ project(CSPP_Coursework C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(CSPP_Coursework main.c)
+add_executable(CSPP_Coursework main.c
+)
