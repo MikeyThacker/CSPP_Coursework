@@ -50,11 +50,8 @@ int getNumLines(const char *fileName) {
      * It receives the name of the file as a parameter when called
      */
 
-    FILE *fp;
-    char c;
-
     // Open file
-    fp = fopen(fileName, "r");
+    FILE *fp = fopen(fileName, "r");
 
     if (fp == NULL) {
         printf("File not found\n");
@@ -64,13 +61,16 @@ int getNumLines(const char *fileName) {
     // Count number of '\n' characters in file
     int lineCount = 0;
     while (1) {
-        c = (char) fgetc(fp);
+        char c = (char) fgetc(fp);
         if (c == EOF) {
             if (lineCount == 0) {
                 break;
             }
-            lineCount++;
             break;
+        }
+        if (lineCount == 0) {
+            // Increase line count to 1 if file is not empty
+            lineCount++;
         }
         if (c == '\n') {
             lineCount++;
@@ -113,8 +113,7 @@ int copy() {
 
 
     // Open file to copy
-    FILE *fp;
-    fp = fopen(strcat(fileName, ".txt"), "r");
+    FILE *fp = fopen(strcat(fileName, ".txt"), "r");
 
     // Check file exists and return to main menu if not
     while (fp == NULL) {
@@ -235,14 +234,10 @@ int insert() {
     getUserInput(fileName, sizeof(fileName));
 
     // File to insert into
-    FILE *fp;
-    char c;
+    FILE *fp = fopen(strcat(fileName, ".txt"), "r");
 
     // New file with insertion
-    FILE *fp2;
-
-    fp = fopen(strcat(fileName, ".txt"), "r");
-    fp2 = fopen("Copy.txt", "w");
+    FILE *fp2 = fopen("Copy.txt", "w");
 
 
     if (fp == NULL) {
@@ -264,14 +259,14 @@ int insert() {
     int lineInserted = 0;
     while (1) {
         // Get next character
-        c = (char) fgetc(fp);
+        char c = (char) fgetc(fp);
 
         // Check not end of file
         if (c == EOF) {
             if (!lineInserted) {
                 printf("File does not have this many lines");
-            remove("Copy.txt");
-            return -1;
+                remove("Copy.txt");
+                return -1;
             }
             fclose(fp);
             fclose(fp2);
@@ -309,9 +304,7 @@ void showFile() {
     getUserInput(fileName, sizeof(fileName));
 
     // Open file in read mode
-    FILE *fp;
-    char c;
-    fp = fopen(strcat(fileName, ".txt"), "r");
+    FILE *fp = fopen(strcat(fileName, ".txt"), "r");
 
     // Check file exists
     if (fp == NULL) {
@@ -321,7 +314,7 @@ void showFile() {
 
     // Output each character until end of file is reached
     while (1) {
-        c = (char) fgetc(fp);
+        char c = (char) fgetc(fp);
         if (c == EOF) {
             break;
         }
@@ -337,9 +330,7 @@ void showLine() {
     getUserInput(fileName, sizeof(fileName));
 
     // Open file
-    FILE *fp;
-    char c;
-    fp = fopen(strcat(fileName, ".txt"), "r");
+    FILE *fp = fopen(strcat(fileName, ".txt"), "r");
 
     // Check file exists
     if (fp == NULL) {
@@ -354,7 +345,7 @@ void showLine() {
     // List through each character of file until desired file is reached
     int lineCount = 1; // Line currently checking
     while (1) {
-        c = (char) fgetc(fp);
+        char c = (char) fgetc(fp);
         // If end of file is reached, number of lines in file is less than input
         if (c == EOF) {
             printf("File does not have this many lines");
@@ -398,15 +389,12 @@ int deleteLine() {
     getUserInput(fileName, sizeof(fileName));
 
     // File to delete line in
-    FILE *fp;
-    char c;
 
     // New file without specified line
-    FILE *fp2;
+    FILE *fp = fopen(strcat(fileName, ".txt"), "r");
 
     // Open file to delete line from and new file without said line
-    fp = fopen(strcat(fileName, ".txt"), "r");
-    fp2 = fopen("Copy.txt", "w");
+    FILE *fp2 = fopen("Copy.txt", "w");
 
     // Check first file exists
     if (fp == NULL) {
@@ -423,14 +411,14 @@ int deleteLine() {
     int lineDeleted = 0;
     while (1) {
         // Get next character
-        c = (char) fgetc(fp);
+        char c = (char) fgetc(fp);
 
         if (c == EOF) {
             if (!lineDeleted) {
                 // If end of file is reached and line has not been 'deleted'
-            printf("File does not have this many lines");
-            remove("Copy.txt");
-            return -1;
+                printf("File does not have this many lines");
+                remove("Copy.txt");
+                return -1;
             }
             // else:
             /*
@@ -472,9 +460,7 @@ void numLines() {
     getUserInput(fileName, sizeof(fileName));
 
     // Open file
-    FILE *fp;
-    char c;
-    fp = fopen(strcat(fileName, ".txt"), "r");
+    FILE *fp = fopen(strcat(fileName, ".txt"), "r");
 
     // Check file exists
     if (fp == NULL) {
@@ -485,7 +471,7 @@ void numLines() {
     // Count number of '\n' characters in file
     int lineCount = 1;
     while (1) {
-        c = (char) fgetc(fp);
+        char c = (char) fgetc(fp);
         if (c == EOF) {
             break;
         }
@@ -512,8 +498,7 @@ int renameFile() {
     getUserInput(oldName, sizeof(oldName));
 
     // Check file exists
-    FILE *fp1;
-    fp1 = fopen(strcat(oldName, ".txt"), "r");
+    FILE *fp1 = fopen(strcat(oldName, ".txt"), "r");
     while (fp1 == NULL) {
         printf("File not found\n");
         fclose(fp1);
@@ -527,8 +512,7 @@ int renameFile() {
     getUserInput(newName, sizeof(newName));
 
     // Check file with new name does not already exist
-    FILE *fp2;
-    fp2 = fopen(strcat(newName, ".txt"), "r");
+    FILE *fp2 = fopen(strcat(newName, ".txt"), "r");
     if (fp2 != NULL) {
         printf("File with this name already exists\n");
         fclose(fp2);
@@ -543,10 +527,8 @@ int renameFile() {
 }
 
 void ls() {
-    DIR *dir; // directory stream variable - essentially list of all entries in cwd
-    struct dirent *entry; // represents what type of thing is in directory (file,folder...)
-
-    dir = opendir("."); // Open current working directory
+    // Directory stream variable - essentially list of all entries in cwd
+    DIR *dir = opendir("."); // Open current working directory
 
     // Check directory opened successfully
     if (dir == NULL) {
@@ -557,7 +539,9 @@ void ls() {
 
     // Repeat until no more entries in directory
     while (1) {
-        entry = readdir(dir); // Read next entry in directory and store in entry
+
+        // Represents what type of thing is in directory (file,folder...)
+        struct dirent *entry = readdir(dir); // Read next entry in directory and store in entry
 
         if (entry == NULL) {
             // No more entries in directory
@@ -617,7 +601,8 @@ int main(void) {
             if (lines >= 0) {
                 char *toAdd = malloc(36); // Allocate enough memory for string
                 snprintf(toAdd, 36, "Copied file of %d lines", lines); // Insert number of lines into string
-                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1);
+                // Allocate enough memory in commandLog[i] to fit string
                 strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
                 free(toAdd); // Free memory used by toAdd
             }
@@ -630,18 +615,21 @@ int main(void) {
             lines = append();
             if (lines >= 0) {
                 char *toAdd = malloc(36); // Allocate enough memory for string
-                snprintf(toAdd, 36, "Appended line to file of %d lines", lines - 1); // Insert number of lines into string
-                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
+                snprintf(toAdd, 36, "Appended line to file of %d lines", lines - 1);
+                // Insert number of lines into string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1);
+                // Allocate enough memory in commandLog[i] to fit string
                 strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
                 free(toAdd); // Free memory used by toAdd
             }
         } else if (!strcmp(input, "insert")) {
-
             lines = insert();
             if (lines > 0) {
                 char *toAdd = malloc(36); // Allocate enough memory for string
-                snprintf(toAdd, 36, "Inserted line into file of %d lines", lines - 1); // Insert number of lines into string
-                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
+                snprintf(toAdd, 36, "Inserted line into file of %d lines", lines - 1);
+                // Insert number of lines into string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1);
+                // Allocate enough memory in commandLog[i] to fit string
                 strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
                 free(toAdd); // Free memory used by toAdd
             }
@@ -653,8 +641,10 @@ int main(void) {
             lines = deleteLine();
             if (lines >= 0) {
                 char *toAdd = malloc(36); // Allocate enough memory for string
-                snprintf(toAdd, 36, "Deleted line in file of %d lines", lines + 1); // Insert number of lines into string
-                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
+                snprintf(toAdd, 36, "Deleted line in file of %d lines", lines + 1);
+                // Insert number of lines into string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1);
+                // Allocate enough memory in commandLog[i] to fit string
                 strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
                 free(toAdd); // Free memory used by toAdd
             }
@@ -667,7 +657,8 @@ int main(void) {
             if (lines >= 0) {
                 char *toAdd = malloc(36); // Allocate enough memory for string
                 snprintf(toAdd, 36, "Renamed file of %d lines", lines); // Insert number of lines into string
-                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1);
+                // Allocate enough memory in commandLog[i] to fit string
                 strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
                 free(toAdd); // Free memory used by toAdd
             }
@@ -679,7 +670,6 @@ int main(void) {
         } else {
             printf("Invalid input\n");
         }
-
     }
     return 0;
 }
