@@ -40,14 +40,14 @@ int getUserInt() {
     fgets(tempString, sizeof(tempString), stdin);
 
     // Convert string input to integer
-    int userInt = strtol(tempString, NULL, 10);
+    int userInt = (int) strtol(tempString, NULL, 10); // strtol converts string to long value, must cast to an integer
     return userInt;
 }
 
 int getNumLines(const char *fileName) {
     /*
      * This method calculates the number of lines in a file without asking the user for its name,
-     * It receives the name of the file as a parameter called in when called
+     * It receives the name of the file as a parameter when called
      */
 
     FILE *fp;
@@ -64,7 +64,7 @@ int getNumLines(const char *fileName) {
     // Count number of '\n' characters in file
     int lineCount = 0;
     while (1) {
-        c = fgetc(fp);
+        c = (char) fgetc(fp);
         if (c == EOF) {
             if (lineCount == 0) {
                 break;
@@ -354,7 +354,7 @@ void showLine() {
     // List through each character of file until desired file is reached
     int lineCount = 1; // Line currently checking
     while (1) {
-        c = fgetc(fp);
+        c = (char) fgetc(fp);
         // If end of file is reached, number of lines in file is less than input
         if (c == EOF) {
             printf("File does not have this many lines");
@@ -425,14 +425,14 @@ int deleteLine() {
         // Get next character
         c = (char) fgetc(fp);
 
-        if (c == EOF && !lineDeleted) {
-            // If end of file is reached and line has not been 'deleted'
+        if (c == EOF) {
+            if (!lineDeleted) {
+                // If end of file is reached and line has not been 'deleted'
             printf("File does not have this many lines");
             remove("Copy.txt");
             return -1;
-        }
-
-        if (c == EOF && lineDeleted) {
+            }
+            // else:
             /*
              * If end of file is reached and line HAS been deleted
              * Close both files
