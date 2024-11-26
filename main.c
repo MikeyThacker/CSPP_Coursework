@@ -191,9 +191,16 @@ int append() {
     char fileName[99];
     getUserInput(fileName, sizeof(fileName));
 
+    FILE *check = fopen(strcat(fileName, ".txt"), "r");
+    // Check file exists and return to main menu if not
+    while (check == NULL) {
+        printf("File not found\n");
+        return -1;
+    }
+
     // Open file in read mode to check if it is empty
     int fileEmpty = 0;
-    if (getNumLines(strcat(fileName, ".txt")) == 0) {
+    if (getNumLines(fileName) == 0) {
         fileEmpty = 1;
     }
 
@@ -211,7 +218,6 @@ int append() {
 
 
     // Add string to file
-
     if (!fileEmpty) {
         fputs("\n", fp);
     }
@@ -220,8 +226,7 @@ int append() {
 
     printf("Content appended successfully\n");
 
-    int numLines = getNumLines(fileName);
-    return numLines;
+    return getNumLines(fileName);
 }
 
 int insert() {
@@ -259,24 +264,24 @@ int insert() {
     int lineInserted = 0;
     while (1) {
         // Get next character
-        c = fgetc(fp);
+        c = (char) fgetc(fp);
 
         // Check not end of file
-        if (c == EOF && !lineInserted) {
-            printf("File does not have this many lines");
+        if (c == EOF) {
+            if (!lineInserted) {
+                printf("File does not have this many lines");
             remove("Copy.txt");
             return -1;
-        }
-        if (c == EOF && lineInserted) {
+            }
             fclose(fp);
             fclose(fp2);
             remove(fileName);
             rename("Copy.txt", fileName);
             printf("Line inserted successfully\n");
 
-            int numLines = getNumLines(fileName);
-            return numLines;
+            return getNumLines(fileName);
         }
+
 
         // Insert new line into file 2
         if (lineCount == lineNum && !lineInserted) {
@@ -418,7 +423,7 @@ int deleteLine() {
     int lineDeleted = 0;
     while (1) {
         // Get next character
-        c = fgetc(fp);
+        c = (char) fgetc(fp);
 
         if (c == EOF && !lineDeleted) {
             // If end of file is reached and line has not been 'deleted'
@@ -480,7 +485,7 @@ void numLines() {
     // Count number of '\n' characters in file
     int lineCount = 1;
     while (1) {
-        c = fgetc(fp);
+        c = (char) fgetc(fp);
         if (c == EOF) {
             break;
         }
@@ -517,7 +522,7 @@ int renameFile() {
     fclose(fp1);
 
     // Get new name of file
-    printf("Enter name of file: ");
+    printf("Enter new name: ");
     char newName[99];
     getUserInput(newName, sizeof(newName));
 
@@ -675,7 +680,6 @@ int main(void) {
             printf("Invalid input\n");
         }
 
-        free(input);
     }
     return 0;
 }
