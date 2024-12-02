@@ -29,7 +29,7 @@ void help() {
     );
 }
 
-void getUserInput(char *userInput, int size) {
+void getUserInput(char *userInput, const int size) {
     fgets(userInput, size, stdin);
     userInput[strlen(userInput) - 1] = '\0';
 }
@@ -40,7 +40,7 @@ int getUserInt() {
     fgets(tempString, sizeof(tempString), stdin);
 
     // Convert string input to integer
-    int userInt = (int) strtol(tempString, NULL, 10); // strtol converts string to long value, must cast to an integer
+    const int userInt = (int) strtol(tempString, NULL, 10); // strtol converts string to long value, must cast to an integer
     return userInt;
 }
 
@@ -601,8 +601,8 @@ int main(void) {
             if (lines >= 0) {
                 char *toAdd = malloc(36); // Allocate enough memory for string
                 snprintf(toAdd, 36, "Copied file of %d lines", lines); // Insert number of lines into string
-                commandLog[currentOp] = malloc(strlen(toAdd) + 1);
-                // Allocate enough memory in commandLog[i] to fit string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
+
                 strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
                 free(toAdd); // Free memory used by toAdd
             }
@@ -615,10 +615,8 @@ int main(void) {
             lines = append();
             if (lines >= 0) {
                 char *toAdd = malloc(36); // Allocate enough memory for string
-                snprintf(toAdd, 36, "Appended line to file of %d lines", lines - 1);
-                // Insert number of lines into string
-                commandLog[currentOp] = malloc(strlen(toAdd) + 1);
-                // Allocate enough memory in commandLog[i] to fit string
+                snprintf(toAdd, 36, "Appended line to file of %d lines", lines - 1); // Insert number of lines into string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
                 strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
                 free(toAdd); // Free memory used by toAdd
             }
@@ -626,10 +624,9 @@ int main(void) {
             lines = insert();
             if (lines > 0) {
                 char *toAdd = malloc(36); // Allocate enough memory for string
-                snprintf(toAdd, 36, "Inserted line into file of %d lines", lines - 1);
-                // Insert number of lines into string
-                commandLog[currentOp] = malloc(strlen(toAdd) + 1);
-                // Allocate enough memory in commandLog[i] to fit string
+                snprintf(toAdd, 36, "Inserted line into file of %d lines", lines - 1); // Insert number of lines into string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
+
                 strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
                 free(toAdd); // Free memory used by toAdd
             }
@@ -641,10 +638,8 @@ int main(void) {
             lines = deleteLine();
             if (lines >= 0) {
                 char *toAdd = malloc(36); // Allocate enough memory for string
-                snprintf(toAdd, 36, "Deleted line in file of %d lines", lines + 1);
-                // Insert number of lines into string
-                commandLog[currentOp] = malloc(strlen(toAdd) + 1);
-                // Allocate enough memory in commandLog[i] to fit string
+                snprintf(toAdd, 36, "Deleted line in file of %d lines", lines + 1); // Insert number of lines into string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
                 strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
                 free(toAdd); // Free memory used by toAdd
             }
@@ -657,8 +652,7 @@ int main(void) {
             if (lines >= 0) {
                 char *toAdd = malloc(36); // Allocate enough memory for string
                 snprintf(toAdd, 36, "Renamed file of %d lines", lines); // Insert number of lines into string
-                commandLog[currentOp] = malloc(strlen(toAdd) + 1);
-                // Allocate enough memory in commandLog[i] to fit string
+                commandLog[currentOp] = malloc(strlen(toAdd) + 1); // Allocate enough memory in commandLog[i] to fit string
                 strcpy(commandLog[currentOp++], toAdd); // Add string to commandLog[currentOp] and increment
                 free(toAdd); // Free memory used by toAdd
             }
