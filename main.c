@@ -552,7 +552,7 @@ void ls() {
 
         // Check type of entry (.txt, .c, folder)
         if (entry->d_type == DT_REG) {
-            // DT_REG means Regular file
+            // DT_REG means Regular file (not folder/ another directory)
             char fileName[99];
             sprintf(fileName, "%s", entry->d_name);
 
